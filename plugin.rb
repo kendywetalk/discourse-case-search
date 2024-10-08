@@ -29,7 +29,7 @@ after_initialize do
     private
 
     def query_case_number(case_number)
-      db_path = '/home/kendy/sheets_data.db' # Update this path to the actual location of your database
+      db_path = '/var/discourse/plugins/discourse-case-search/sheets_data.db' # Update this path to the actual location of your database
       db = SQLite3::Database.new(db_path)
       db.results_as_hash = true
       query = 'SELECT * FROM cases WHERE Case_Number = ?'
