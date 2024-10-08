@@ -2,9 +2,7 @@ require 'net/http'
 require 'json'
 
 module ::CaseSearch
-  class SearchController < ::ActionController::Base
-    requires_plugin "discourse-case-search"
-
+  class SearchController < ::ApplicationController
     def search_case_number
       case_number = params[:case_number]
       uri = URI("http://flask-api-host:5000/search?case_number=#{URI.encode_www_form_component(case_number)}")
