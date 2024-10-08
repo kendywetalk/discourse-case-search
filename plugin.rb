@@ -1,5 +1,5 @@
 # Plugin name: discourse-case-search
-# about: Plugin to search case information in the database
+# about: Plugin to search case information from SQLite database without modifying PostgreSQL
 # version: 1.0
 # author: Kendy
 
@@ -29,7 +29,7 @@ after_initialize do
     private
 
     def query_case_number(case_number)
-      db_path = '/var/discourse/plugins/discourse-case-search/sheets_data.db' # Update this path to the actual location of your database
+      db_path = '/var/discourse/plugins/discourse-case-search/sheets_data.db' # Ensure the DB is accessible to the container
       db = SQLite3::Database.new(db_path)
       db.results_as_hash = true
       query = 'SELECT * FROM cases WHERE Case_Number = ?'
@@ -53,39 +53,4 @@ after_initialize do
       }
     end
   end
-end
-
-# Extend the Discourse search UI to integrate the case search feature
-DiscourseEvent.on(:before_search) do |search|
-  if search.term.match?(/^G-\d{3,5}-\d{5,}$/)
-    case_number = search.term.strip
-    result = Discourse::Application.routes.call(
-      Rack::MockRequest.env_for("/case_search?case_number=#{case_number}")
-    )
-    body = result[2].body.join
-    search.add_custom_result({
-      title: "Case Information for #{case_number}",
-      raw: format_search_result(body),
-      url: "/case_search?case_number=#{case_number}"
-    }) if result[0] == 200
-  end
-end
-
-# Helper method to format the search result
-def format_search_result(body)
-  result = JSON.parse(body)
-  return "Case not found" if result['error']
-
-  """
-  **Case Number**: #{result['case_number']}
-  **Priority Date**: #{result['priority_date']}
-  **Draft Date**: #{result['draft_date']}
-  **Audit Date**: #{result['audit_date']}
-  **Result Date**: #{result['result_date']}
-  **Status**: #{result['status']}
-  **Days to Result**: #{result['days_to_result']}
-  **Days Pending**: #{result['days_pending']}
-  **Employer Name**: #{result['employer_name']}
-  **Job Title**: #{result['job_title']}
-  """
 end
