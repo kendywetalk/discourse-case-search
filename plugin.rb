@@ -1,30 +1,40 @@
 # name: discourse-case-search
-# about: A plugin to search for case numbers in Discourse
+# about: A plugin to search for cases in Discourse
 # version: 0.1
-# authors: Kendy
-# url: https://github.com/kendywetalk/discourse-case-search
+# authors: kendywetalk
 
-require 'net/http'
-require 'json'
+enabled_site_setting :case_search_enabled
 
-module ::CaseSearch
-  class SearchController < ::ActionController::Base
-    def search_case_number
+register_asset "javascripts/case-search.js.es6"
+
+after_initialize do
+  module ::CaseSearch
+    class Engine < ::Rails::Engine
+      engine_name "case_search"
+      isolate_namespace CaseSearch
+    end
+  end
+
+  require_dependency "application_controller"
+  class CaseSearch::CaseSearchController < ::ApplicationController
+    requires_plugin ::CaseSearch
+
+    def search
       case_number = params[:case_number]
-      uri = URI("http://127.0.0.1:5000/search?case_number=#{URI.encode_www_form_component(case_number)}")
-      response = Net::HTTP.get(uri)
-      result = JSON.parse(response)
-
-      if result['status'] == 'found'
-        render json: { status: 'found', data: result['data'] }
+      if case_number.blank?
+        render json: { status: "error", message: "Case number is required" }, status: 400
       else
-        render json: { status: 'not found' }
+        response = Net::HTTP.get_response(URI("http://192.168.1.44:5000/search?case_number=#{case_number}"))
+        render json: JSON.parse(response.body)
       end
     end
   end
-end
 
-# Register route to connect the controller to a URL endpoint
-Discourse::Application.routes.append do
-  get '/case-search' => 'case_search/search#search_case_number'
+  CaseSearch::Engine.routes.draw do
+    get "/search" => "case_search#search"
+  end
+
+  Discourse::Application.routes.append do
+    mount ::CaseSearch::Engine, at: "/case-search"
+  end
 end
