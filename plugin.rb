@@ -2,12 +2,12 @@ require 'net/http'
 require 'json'
 
 module ::CaseSearch
-  class SearchController < ::ApplicationController
+  class SearchController < ::ActionController::Base
     requires_plugin "discourse-case-search"
 
     def search_case_number
       case_number = params[:case_number]
-      uri = URI("http://localhost:5000/search?case_number=#{URI.encode_www_form_component(case_number)}")
+      uri = URI("http://flask-api-host:5000/search?case_number=#{URI.encode_www_form_component(case_number)}")
       response = Net::HTTP.get(uri)
       result = JSON.parse(response)
 
@@ -20,16 +20,7 @@ module ::CaseSearch
   end
 end
 
-# Registering route to the controller
+# Register route to connect the controller to a URL endpoint
 Discourse::Application.routes.append do
   get '/case-search' => 'case_search/search#search_case_number'
-end
-
-# JavaScript and modal template registration
-register_asset 'javascripts/case-search.js.es6'
-
-after_initialize do
-  Discourse::Application.routes.append do
-    get '/case-search' => 'case_search/search#search_case_number'
-  end
 end
