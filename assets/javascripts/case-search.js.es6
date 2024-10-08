@@ -6,6 +6,7 @@ export default {
 
   initialize() {
     withPluginApi('0.8.7', (api) => {
+      // Lắng nghe sự kiện nhập vào ô tìm kiếm
       api.modifyClass('component:search-menu', {
         keyDown(e) {
           this._super(e);
