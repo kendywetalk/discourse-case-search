@@ -11,7 +11,7 @@ module ::CaseSearch
   class SearchController < ::ActionController::Base
     def search_case_number
       case_number = params[:case_number]
-      uri = URI("http://localhost:5000/search?case_number=#{URI.encode_www_form_component(case_number)}")
+      uri = URI("http://127.0.0.1:5000/search?case_number=#{URI.encode_www_form_component(case_number)}")
       response = Net::HTTP.get(uri)
       result = JSON.parse(response)
 
