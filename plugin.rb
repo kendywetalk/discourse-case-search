@@ -5,8 +5,6 @@
 
 enabled_site_setting :case_search_enabled
 
-register_asset "javascripts/case-search.js.es6"
-
 after_initialize do
   module ::CaseSearch
     class Engine < ::Rails::Engine
