@@ -1,3 +1,9 @@
+# name: discourse-case-search
+# about: A plugin to search for case numbers in Discourse
+# version: 0.1
+# authors: Kendy
+# url: https://github.com/yourusername/discourse-case-search
+
 require 'net/http'
 require 'json'
 
