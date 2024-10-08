@@ -2,7 +2,7 @@
 # about: A plugin to search for case numbers in Discourse
 # version: 0.1
 # authors: Kendy
-# url: https://github.com/yourusername/discourse-case-search
+# url: https://github.com/kendywetalk/discourse-case-search
 
 require 'net/http'
 require 'json'
